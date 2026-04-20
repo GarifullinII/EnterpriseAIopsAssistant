@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -5,7 +6,6 @@ from pydantic import BaseModel
 app = FastAPI(
     title="Enterprise AI Operations Assistant",
     version="0.1.0",
-    description="Production-style AI assistant with RAG, MCP, agents and workflows.",
 )
 
 
@@ -13,6 +13,9 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
+    postgres_host: str
+    redis_host: str
+    qdrant_host: str
 
 
 @app.get("/")
@@ -25,5 +28,8 @@ async def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         service="api",
-        version="0.1.0",
+        version=os.getenv("APP_VERSION", "0.1.0"),
+        postgres_host=os.getenv("POSTGRES_HOST", "unknown"),
+        redis_host=os.getenv("REDIS_HOST", "unknown"),
+        qdrant_host=os.getenv("QDRANT_HOST", "unknown"),
     )
