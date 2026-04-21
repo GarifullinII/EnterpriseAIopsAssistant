@@ -29,9 +29,14 @@ At the current stage, the project includes:
 ```text
 .
 ├── app/
+│   ├── api/routes/documents.py
+│   ├── core/
+│   ├── models/document.py
+│   ├── schemas/document.py
 │   └── main.py
 ├── Dockerfile
 ├── compose.yaml
+├── uploads/
 ├── requirements.txt
 └── README.md
 ```
@@ -39,8 +44,11 @@ At the current stage, the project includes:
 ### Key files
 
 - `app/main.py` - FastAPI application entrypoint
+- `app/api/routes/documents.py` - document creation and upload endpoints
+- `app/models/document.py` - SQLAlchemy document model
+- `app/schemas/document.py` - request and response schemas for documents
 - `Dockerfile` - container image for the API service
-- `compose.yaml` - local stack with API, PostgreSQL, Redis, and Qdrant
+- `compose.yaml` - local stack with API, PostgreSQL, Redis, and Qdrant, plus mounted uploads storage
 - `requirements.txt` - Python dependencies
 
 ## API
@@ -48,7 +56,9 @@ At the current stage, the project includes:
 Current endpoints:
 
 - `GET /` - returns a basic service message
-- `GET /health` - returns service status, version, and configured infrastructure hosts
+- `GET /health` - returns service status, version, and current database host
+- `POST /documents` - creates a document record without a file
+- `POST /documents/upload` - uploads a file, stores it in `uploads/`, and updates document metadata
 
 Example `/health` response:
 
@@ -57,9 +67,22 @@ Example `/health` response:
   "status": "ok",
   "service": "api",
   "version": "0.1.0",
-  "postgres_host": "postgres",
-  "redis_host": "redis",
-  "qdrant_host": "qdrant"
+  "database_host": "postgres"
+}
+```
+
+Example `/documents/upload` response:
+
+```json
+{
+  "id": "d9c2b6ce-0817-4dfa-adf7-a8cb90397282",
+  "title": "VPN policy",
+  "source": "manual",
+  "status": "stored",
+  "original_filename": "vpn-policy.pdf",
+  "file_path": "uploads/d9c2b6ce-0817-4dfa-adf7-a8cb90397282.pdf",
+  "mime_type": "application/pdf",
+  "created_at": "2026-04-21T13:21:06.032602"
 }
 ```
 
@@ -114,6 +137,11 @@ This starts:
 - `redis` on port `6379`
 - `qdrant` on ports `6333` and `6334`
 
+The `uploads/` directory is mounted into the API container, so uploaded files are visible both:
+
+- inside the container at `/app/uploads`
+- locally in the project folder at `./uploads`
+
 ## Environment variables
 
 The API currently reads these variables:
@@ -123,8 +151,11 @@ The API currently reads these variables:
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 - `POSTGRES_HOST`
+- `POSTGRES_PORT`
 - `REDIS_HOST`
+- `REDIS_PORT`
 - `QDRANT_HOST`
+- `QDRANT_PORT`
 
 Example `.env`:
 
@@ -140,23 +171,24 @@ QDRANT_HOST=qdrant
 
 ## Current status
 
-Day 1:
+Day 4:
 
-- base project structure created;
-- FastAPI application started;
-- `/health` endpoint implemented;
-- Dockerfile added for API containerization;
-- Docker Compose stack added for PostgreSQL, Redis, and Qdrant;
-- `.gitignore` updated for local environments and generated artifacts.
+- base FastAPI service is running;
+- PostgreSQL, Redis, and Qdrant start via Docker Compose;
+- `Document` model includes file metadata and processing status;
+- `/documents` creates a document record;
+- `/documents/upload` accepts multipart form data and saves files to `uploads/`;
+- uploaded files are persisted through a Docker volume mount;
+- document status changes from `uploaded` to `stored` after file save.
 
 ## Roadmap
 
 Next planned steps:
 
-- split API routes and service logic into dedicated modules;
-- add configuration management and settings layer;
-- connect PostgreSQL models and persistence;
-- add Redis-backed caching and job processing;
-- create the first RAG ingestion and query flow;
+- extract text from uploaded documents;
+- add document processing states beyond `stored`;
+- create the first ingestion pipeline for chunking;
+- generate embeddings and save them to Qdrant;
+- create the first RAG retrieval and answer flow;
 - add MCP server capabilities;
 - introduce observability, testing, and deployment automation.
