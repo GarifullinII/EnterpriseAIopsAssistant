@@ -6,6 +6,8 @@ from app.schemas.document import DocumentCreate, DocumentResponse
 from pathlib import Path
 import shutil
 
+from app.services.extraction import extract_text_from_file
+
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -83,3 +85,35 @@ def upload_document(
         file.file.close()
 
     return document
+
+@router.post("/{document_id}/process", response_model=DocumentResponse)
+def process_document(document_id: str, db: Session = Depends(get_db)) -> Document:
+    document = db.get(Document, document_id)
+
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if not document.file_path:
+        raise HTTPException(status_code=400, detail="Document has no file path")
+
+    try:
+        document.status = "processing"
+        db.commit()
+        db.refresh(document)
+
+        extracted_text = extract_text_from_file(document.file_path)
+
+        document.extracted_text = extracted_text
+        document.status = "processed"
+
+        db.commit()
+        db.refresh(document)
+
+        return document
+
+    except Exception as e:
+        document.status = "failed"
+        db.commit()
+        db.refresh(document)
+
+        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
