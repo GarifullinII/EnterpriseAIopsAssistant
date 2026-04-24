@@ -10,3 +10,5 @@ python-docx
 openpyxl
 xlrd
 alembic
+langchain==0.3.27
+langchain-text-splitters==0.3.9

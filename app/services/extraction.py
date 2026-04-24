@@ -29,13 +29,11 @@ def extract_text_from_docx(path: Path) -> str:
 
     parts = []
 
-    # Обычные абзацы
     for paragraph in doc.paragraphs:
         text = paragraph.text.strip()
         if text:
             parts.append(text)
 
-    # Таблицы
     for table in doc.tables:
         for row in table.rows:
             cells = [cell.text.strip() for cell in row.cells]
@@ -98,7 +96,6 @@ def convert_doc_to_docx(path: Path) -> Path:
         if not converted.exists():
             raise RuntimeError(f"Не удалось конвертировать .doc в .docx: {result.stdout} {result.stderr}")
 
-        # Копируем во временный постоянный файл, чтобы вернуть Path
         final_path = path.with_suffix(".converted.docx")
         final_path.write_bytes(converted.read_bytes())
         return final_path

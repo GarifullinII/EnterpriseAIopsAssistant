@@ -2,10 +2,13 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, s
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.document import Document
+from app.models.document_chunk import DocumentChunk
 from app.schemas.document import DocumentCreate, DocumentResponse
 from pathlib import Path
 import shutil
 
+from app.schemas.document_chunk import DocumentChunkResponse
+from app.services.chunking import build_document_chunks, save_document_chunks
 from app.services.extraction import extract_text_from_file
 
 
@@ -117,3 +120,63 @@ def process_document(document_id: str, db: Session = Depends(get_db)) -> Documen
         db.refresh(document)
 
         raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
+    
+
+@router.post("/{document_id}/chunk", response_model=DocumentResponse)
+def chunk_document(document_id: str, db: Session = Depends(get_db)) -> Document:
+    document = db.get(Document, document_id)
+
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if not document.extracted_text:
+        raise HTTPException(
+            status_code=400,
+            detail="Document has no extracted_text. Run /process first."
+        )
+
+    try:
+        document.status = "chunking"
+        db.commit()
+        db.refresh(document)
+
+        chunks = build_document_chunks(
+            document_id=document.id,
+            text=document.extracted_text,
+            chunk_size=800,
+            chunk_overlap=150,
+        )
+
+        if not chunks:
+            raise HTTPException(
+                status_code=400,
+                detail="Extracted text is empty after normalization"
+            )
+
+        save_document_chunks(db=db, document=document, chunks=chunks)
+
+        db.refresh(document)
+        return document
+
+    except HTTPException:
+        document.status = "failed"
+        db.commit()
+        db.refresh(document)
+        raise
+
+    except Exception as e:
+        document.status = "failed"
+        db.commit()
+        db.refresh(document)
+
+        raise HTTPException(status_code=500, detail=f"Chunking failed: {str(e)}")
+
+
+@router.get("/{document_id}/chunks", response_model=list[DocumentChunkResponse])
+def get_document_chunks(document_id: str, db: Session = Depends(get_db)) -> list[DocumentChunk]:
+    document = db.get(Document, document_id)
+
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    return document.chunks

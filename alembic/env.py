@@ -4,8 +4,7 @@ from alembic import context
 from app.core.config import settings
 from app.core.database import Base
 from app.models.document import Document
-
-# from app.models.chunk import DocumentChunk
+from app.models.document_chunk import DocumentChunk
 
 
 config = context.config

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+from app.schemas.document_chunk import DocumentChunkResponse
 
 
 class DocumentCreate(BaseModel):
@@ -22,3 +23,7 @@ class DocumentResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DocumentWithChunksResponse(DocumentResponse):
+    chunks: list[DocumentChunkResponse] = Field(default_factory=list)
