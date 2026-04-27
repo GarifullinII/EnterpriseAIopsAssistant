@@ -10,10 +10,16 @@ class Settings(BaseSettings):
     postgres_password: str = "aiops"
     postgres_host: str = "postgres"
     postgres_port: int = 5432
+
     redis_host: str = "redis"
     redis_port: int = 6379
+
     qdrant_host: str = "qdrant"
     qdrant_port: int = 6333
+    qdrant_collection_name: str = "document_chunks"
+
+    openai_api_key: str = ""
+    embedding_model: str = "text-embedding-3-small"
 
     model_config = SettingsConfigDict(
         env_file=".env",

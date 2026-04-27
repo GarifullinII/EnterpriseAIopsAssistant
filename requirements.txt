@@ -12,3 +12,6 @@ xlrd
 alembic
 langchain==0.3.27
 langchain-text-splitters==0.3.9
+qdrant-client
+langchain-openai
+openai

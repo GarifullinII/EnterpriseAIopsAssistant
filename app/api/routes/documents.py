@@ -6,10 +6,10 @@ from app.models.document_chunk import DocumentChunk
 from app.schemas.document import DocumentCreate, DocumentResponse
 from pathlib import Path
 import shutil
-
 from app.schemas.document_chunk import DocumentChunkResponse
 from app.services.chunking import build_document_chunks, save_document_chunks
 from app.services.extraction import extract_text_from_file
+from app.services.indexing import index_document_chunks
 
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -180,3 +180,39 @@ def get_document_chunks(document_id: str, db: Session = Depends(get_db)) -> list
         raise HTTPException(status_code=404, detail="Document not found")
 
     return document.chunks
+
+
+@router.post("/{document_id}/index", response_model=DocumentResponse)
+def index_document(document_id: str, db: Session = Depends(get_db)) -> Document:
+    document = db.get(Document, document_id)
+
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if document.status != "chunked":
+        raise HTTPException(
+            status_code=400,
+            detail="Document must be chunked before indexing"
+        )
+
+    try:
+        document.status = "indexing"
+        db.commit()
+        db.refresh(document)
+
+        index_document_chunks(db=db, document=document)
+
+        db.refresh(document)
+        return document
+
+    except HTTPException:
+        db.rollback()
+        raise
+
+    except Exception as e:
+        db.rollback()
+        document.status = "failed"
+        db.commit()
+        db.refresh(document)
+
+        raise HTTPException(status_code=500, detail=f"Indexing failed: {str(e)}")
