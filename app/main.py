@@ -1,6 +1,9 @@
 from fastapi import FastAPI
+from app.api.routes.document_search import router as document_search_router
 from app.api.routes.documents import router as documents_router
+from app.api.routes.search import router as search_router
 from app.core.config import settings
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -25,3 +28,5 @@ async def health() -> dict:
 
 
 app.include_router(documents_router)
+app.include_router(search_router)
+app.include_router(document_search_router)
