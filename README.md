@@ -49,6 +49,8 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - `GET /documents/{document_id}/chunks`
 - `POST /documents/{document_id}/index`
 - `POST /search`
+- `POST /search/documents/{document_id}`
+- `POST /ask`
 
 ### Что Уже Реализовано
 
@@ -58,12 +60,14 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - Alembic миграции для `documents` и `document_chunks`
 - indexing pipeline через OpenAI embeddings и Qdrant upsert
 - semantic search endpoint для поиска релевантных chunks в Qdrant
+- document-level semantic search
+- RAG answer endpoint with sources
 - pipeline статусов документа: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Текущий Flow
 
 ```text
-upload -> store -> extract text -> chunk text -> index in Qdrant -> semantic search
+upload -> store -> extract text -> chunk text -> index in Qdrant -> semantic search -> RAG answer
 ```
 
 ### Запуск
@@ -138,6 +142,8 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - `GET /documents/{document_id}/chunks`
 - `POST /documents/{document_id}/index`
 - `POST /search`
+- `POST /search/documents/{document_id}`
+- `POST /ask`
 
 ### What Is Implemented Now
 
@@ -147,12 +153,14 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - Alembic migrations for `documents` and `document_chunks`
 - document indexing flow with OpenAI embeddings and Qdrant upsert
 - semantic search endpoint for retrieving relevant chunks from Qdrant
+- document-level semantic search
+- RAG answer endpoint with sources
 - document status pipeline: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Current Flow
 
 ```text
-upload -> store -> extract text -> chunk text -> index in Qdrant -> semantic search
+upload -> store -> extract text -> chunk text -> index in Qdrant -> semantic search -> RAG answer
 ```
 
 ### Run
