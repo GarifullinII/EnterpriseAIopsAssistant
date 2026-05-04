@@ -7,7 +7,7 @@ from app.models.document_chunk import DocumentChunk
 
 def get_qdrant_client() -> QdrantClient:
     return QdrantClient(
-        host=settings.qdrant_host,
+        host=settings.resolved_qdrant_host,
         port=settings.qdrant_port,
     )
 

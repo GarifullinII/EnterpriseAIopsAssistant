@@ -24,7 +24,7 @@ async def health() -> dict:
         "status": "ok",
         "service": "api",
         "version": settings.app_version,
-        "database_host": settings.postgres_host,
+        "database_host": settings.resolved_postgres_host,
     }
 
 
@@ -32,4 +32,3 @@ app.include_router(documents_router)
 app.include_router(search_router)
 app.include_router(document_search_router)
 app.include_router(ask_router)
-

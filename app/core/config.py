@@ -1,3 +1,4 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,11 +30,42 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    @staticmethod
+    def _is_running_in_docker() -> bool:
+        return Path("/.dockerenv").exists()
+
+    def _resolve_host(self, host: str) -> str:
+        if self._is_running_in_docker():
+            return host
+
+        docker_service_hosts = {
+            "postgres",
+            "redis",
+            "qdrant",
+        }
+
+        if host in docker_service_hosts:
+            return "localhost"
+
+        return host
+
+    @property
+    def resolved_postgres_host(self) -> str:
+        return self._resolve_host(self.postgres_host)
+
+    @property
+    def resolved_redis_host(self) -> str:
+        return self._resolve_host(self.redis_host)
+
+    @property
+    def resolved_qdrant_host(self) -> str:
+        return self._resolve_host(self.qdrant_host)
+
     @property
     def database_url(self) -> str:
         return (
             f"postgresql://{self.postgres_user}:"
-            f"{self.postgres_password}@{self.postgres_host}:"
+            f"{self.postgres_password}@{self.resolved_postgres_host}:"
             f"{self.postgres_port}/{self.postgres_db}"
         )
 
