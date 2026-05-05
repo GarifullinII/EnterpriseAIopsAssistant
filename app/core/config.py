@@ -45,7 +45,7 @@ class Settings(BaseSettings):
         }
 
         if host in docker_service_hosts:
-            return "localhost"
+            return "127.0.0.1"
 
         return host
 

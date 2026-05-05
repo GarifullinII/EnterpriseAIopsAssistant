@@ -51,6 +51,7 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - `POST /search`
 - `POST /search/documents/{document_id}`
 - `POST /ask`
+- `POST /agent/query`
 
 ### MCP Layer
 
@@ -59,6 +60,14 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - `get_document_chunks` tool
 - `documents://catalog` resource
 - `document_qa_prompt` prompt template
+
+### Agent Layer
+
+- basic rule-based router
+- `knowledge_agent`
+- `action_agent`
+- route types: `search / ask / action`
+- endpoint: `POST /agent/query`
 
 ### Что Уже Реализовано
 
@@ -71,6 +80,9 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - document-level semantic search
 - RAG answer endpoint with sources
 - MCP server поверх существующих retrieval и RAG сервисов
+- базовый agent routing layer для `search / ask / action`
+- knowledge agent поверх retrieval и RAG сервисов
+- action agent stub для Day 12 backend actions
 - pipeline статусов документа: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Текущий Flow
@@ -83,6 +95,12 @@ MCP flow:
 
 ```text
 MCP client -> FastMCP server -> tools/resources/prompts -> existing app services
+```
+
+Agent flow:
+
+```text
+User query -> router -> knowledge_agent or action_agent -> existing app services
 ```
 
 ### Запуск
@@ -165,6 +183,7 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - `POST /search`
 - `POST /search/documents/{document_id}`
 - `POST /ask`
+- `POST /agent/query`
 
 ### MCP Layer
 
@@ -173,6 +192,14 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - `get_document_chunks` tool
 - `documents://catalog` resource
 - `document_qa_prompt` prompt template
+
+### Agent Layer
+
+- basic rule-based router
+- `knowledge_agent`
+- `action_agent`
+- route types: `search / ask / action`
+- endpoint: `POST /agent/query`
 
 ### What Is Implemented Now
 
@@ -185,6 +212,9 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - document-level semantic search
 - RAG answer endpoint with sources
 - MCP server built on top of the existing retrieval and RAG services
+- basic agent routing layer for `search / ask / action`
+- knowledge agent on top of retrieval and RAG services
+- action agent stub for Day 12 backend actions
 - document status pipeline: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Current Flow
@@ -197,6 +227,12 @@ MCP flow:
 
 ```text
 MCP client -> FastMCP server -> tools/resources/prompts -> existing app services
+```
+
+Agent flow:
+
+```text
+User query -> router -> knowledge_agent or action_agent -> existing app services
 ```
 
 ### Run

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.api.routes.document_search import router as document_search_router
+from app.api.routes.agent import router as agent_router
 from app.api.routes.documents import router as documents_router
 from app.api.routes.search import router as search_router
 from app.api.routes.ask import router as ask_router
@@ -32,3 +33,4 @@ app.include_router(documents_router)
 app.include_router(search_router)
 app.include_router(document_search_router)
 app.include_router(ask_router)
+app.include_router(agent_router)
