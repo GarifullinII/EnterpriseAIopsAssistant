@@ -8,10 +8,6 @@ SEARCH_KEYWORDS = {
     "найди",
     "найти",
     "поиск",
-    "покажи",
-    "show",
-    "list",
-    "список",
 }
 
 ACTION_KEYWORDS = {
@@ -28,6 +24,21 @@ ACTION_KEYWORDS = {
     "переиндексируй",
     "обнови",
     "обработай",
+    "show documents",
+    "list documents",
+    "show all documents",
+    "покажи документы",
+    "покажи все документы",
+    "список документов",
+    "document status",
+    "get status",
+    "check status",
+    "статус документа",
+    "проверь статус",
+    "какой статус",
+    "process document",
+    "ingest document",
+    "обработай документ",
 }
 
 

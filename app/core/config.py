@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,12 @@ class Settings(BaseSettings):
 
     chat_model: str = "gpt-4.1-mini"
 
+    n8n_base_url: str = "http://n8n:5678"
+    n8n_ingestion_webhook_path: str = "/webhook/ingestion-reindex"
+    n8n_document_processing_webhook_path: str = "/webhook/document-processing"
+    n8n_notification_webhook_path: str = "/webhook/notification-sync"
+
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -42,6 +49,7 @@ class Settings(BaseSettings):
             "postgres",
             "redis",
             "qdrant",
+            "n8n",
         }
 
         if host in docker_service_hosts:
@@ -60,6 +68,22 @@ class Settings(BaseSettings):
     @property
     def resolved_qdrant_host(self) -> str:
         return self._resolve_host(self.qdrant_host)
+
+    @property
+    def resolved_n8n_base_url(self) -> str:
+        parsed = urlsplit(self.n8n_base_url)
+        resolved_host = self._resolve_host(parsed.hostname or "")
+
+        if not resolved_host:
+            return self.n8n_base_url
+
+        netloc = resolved_host
+        if parsed.port is not None:
+            netloc = f"{resolved_host}:{parsed.port}"
+
+        return urlunsplit(
+            (parsed.scheme, netloc, parsed.path, parsed.query, parsed.fragment)
+        )
 
     @property
     def database_url(self) -> str:

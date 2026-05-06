@@ -52,6 +52,7 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - `POST /search/documents/{document_id}`
 - `POST /ask`
 - `POST /agent/query`
+- `POST /workflows/trigger`
 
 ### MCP Layer
 
@@ -69,6 +70,21 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - route types: `search / ask / action`
 - endpoint: `POST /agent/query`
 
+### Actions Layer
+
+- `list_documents`
+- `get_document_status`
+- `trigger_ingestion_step`
+- backend action dispatch through `action_agent`
+
+### Workflow Layer
+
+- `POST /workflows/trigger`
+- `ingestion_reindex` webhook workflow in n8n
+- `document_processing` webhook workflow in n8n
+- `notification_sync` webhook workflow in n8n
+- backend workflow dispatch through `app/services/workflow_dispatcher.py`
+
 ### Что Уже Реализовано
 
 - загрузка документов и сохранение файлов
@@ -82,7 +98,10 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - MCP server поверх существующих retrieval и RAG сервисов
 - базовый agent routing layer для `search / ask / action`
 - knowledge agent поверх retrieval и RAG сервисов
-- action agent stub для Day 12 backend actions
+- actions layer с `list_documents`, `get_document_status`, `trigger_ingestion_step`
+- action agent с backend action dispatch
+- workflow dispatch layer for n8n webhook orchestration
+- n8n workflows for ingestion/reindex, document processing, and notification sync
 - pipeline статусов документа: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Текущий Flow
@@ -101,6 +120,18 @@ Agent flow:
 
 ```text
 User query -> router -> knowledge_agent or action_agent -> existing app services
+```
+
+Action flow:
+
+```text
+User action query -> agent router -> action_agent -> actions layer -> database/services
+```
+
+Workflow flow:
+
+```text
+Client/API -> workflow dispatcher -> n8n webhook -> backend document endpoints -> workflow summary
 ```
 
 ### Запуск
@@ -184,6 +215,7 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - `POST /search/documents/{document_id}`
 - `POST /ask`
 - `POST /agent/query`
+- `POST /workflows/trigger`
 
 ### MCP Layer
 
@@ -201,6 +233,21 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - route types: `search / ask / action`
 - endpoint: `POST /agent/query`
 
+### Actions Layer
+
+- `list_documents`
+- `get_document_status`
+- `trigger_ingestion_step`
+- backend action dispatch through `action_agent`
+
+### Workflow Layer
+
+- `POST /workflows/trigger`
+- `ingestion_reindex` webhook workflow in n8n
+- `document_processing` webhook workflow in n8n
+- `notification_sync` webhook workflow in n8n
+- backend workflow dispatch through `app/services/workflow_dispatcher.py`
+
 ### What Is Implemented Now
 
 - document upload and file storage
@@ -214,7 +261,10 @@ This project is designed as a practical MVP for AI Backend / Applied AI / RAG Pl
 - MCP server built on top of the existing retrieval and RAG services
 - basic agent routing layer for `search / ask / action`
 - knowledge agent on top of retrieval and RAG services
-- action agent stub for Day 12 backend actions
+- actions layer with `list_documents`, `get_document_status`, and `trigger_ingestion_step`
+- action agent with backend action dispatch
+- workflow dispatch layer for n8n webhook orchestration
+- n8n workflows for ingestion/reindex, document processing, and notification sync
 - document status pipeline: `uploaded -> stored -> processed -> chunked -> indexed`
 
 ### Current Flow
@@ -233,6 +283,18 @@ Agent flow:
 
 ```text
 User query -> router -> knowledge_agent or action_agent -> existing app services
+```
+
+Action flow:
+
+```text
+User action query -> agent router -> action_agent -> actions layer -> database/services
+```
+
+Workflow flow:
+
+```text
+Client/API -> workflow dispatcher -> n8n webhook -> backend document endpoints -> workflow summary
 ```
 
 ### Run

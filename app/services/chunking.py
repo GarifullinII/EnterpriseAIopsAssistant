@@ -110,17 +110,20 @@ def save_document_chunks(
 
     Если документ chunk'ится повторно, сначала удаляем старые chunks.
     """
-    db.query(DocumentChunk).filter(DocumentChunk.document_id == document.id).delete()
+    # Re-chunking should replace existing rows without relying on refresh() for
+    # every newly inserted ORM object after commit.
+    db.query(DocumentChunk).filter(
+        DocumentChunk.document_id == document.id
+    ).delete(synchronize_session=False)
 
     for chunk in chunks:
         db.add(chunk)
 
     document.status = "chunked"
 
+    # Flush first so generated primary keys are assigned before commit.
+    db.flush()
     db.commit()
-
-    for chunk in chunks:
-        db.refresh(chunk)
 
     db.refresh(document)
 
