@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import os
 import sys
 
 import anyio
@@ -14,7 +15,7 @@ from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
-MCP_URL = "http://127.0.0.1:8000/mcp"
+MCP_URL = os.getenv("MCP_URL", "http://127.0.0.1:8100/mcp")
 
 
 def build_arguments() -> dict:

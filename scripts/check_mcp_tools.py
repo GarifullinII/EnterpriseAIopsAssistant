@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import sys
 import anyio
 
@@ -13,7 +14,7 @@ from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
-MCP_URL = "http://127.0.0.1:8000/mcp"
+MCP_URL = os.getenv("MCP_URL", "http://127.0.0.1:8100/mcp")
 
 
 def format_tool(tool: types.Tool) -> str:

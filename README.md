@@ -17,13 +17,6 @@ Production-like backend-платформа для enterprise AI assistant с а�
 - MCP server layer
 - будущие agent workflows и automation через n8n
 
-Проект делается как практический MVP под направления:
-
-- AI Backend Engineer
-- Applied AI Engineer
-- Python Backend Engineer
-- RAG / LLM Platform Engineer
-
 ### Стек
 
 - Python
@@ -157,6 +150,8 @@ docker compose up --build
 python scripts/run_mcp.py
 ```
 
+По умолчанию MCP server поднимается на `http://127.0.0.1:8100/mcp`.
+
 Проверка MCP tools программно:
 
 ```bash
@@ -184,8 +179,6 @@ Enterprise AI backend platform focused on:
 - LangChain OpenAI embeddings integration
 - MCP server layer
 - upcoming agent routing and n8n workflows
-
-This project is designed as a practical MVP for AI Backend / Applied AI / RAG Platform roles.
 
 ### Stack
 
@@ -319,6 +312,8 @@ Run MCP server:
 ```bash
 python scripts/run_mcp.py
 ```
+
+By default the MCP server is exposed at `http://127.0.0.1:8100/mcp`.
 
 Check MCP tools programmatically:
 
